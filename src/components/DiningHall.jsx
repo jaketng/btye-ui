@@ -1,37 +1,75 @@
 import React, { useState } from "react";
 import MealOption from "./MealOption";
+import RatingPopup from "./RatingPopup";
 
 function DiningHall({ name, rating, mealOptions }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState(null);
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const handleRateClick = (meal) => {
+    setSelectedMeal(meal);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedMeal(null);
+  };
+
+  const handleRatingSubmit = (rating) => {
+    console.log(`Rated ${selectedMeal.foodName} at ${name}: ${rating} stars`);
+    handleClosePopup();
+  };
 
   return (
-    <div className="card bg-base-100 shadow-md mb-4">
-      <div
-        className="card-header flex justify-between items-center cursor-pointer p-4"
-        onClick={() => setIsOpen(!isOpen)}
-      >
+    <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+      {/* Dining Hall Header */}
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl font-bold">{name}</h2>
-          {/* Star Ratings */}
-          <div className="flex items-center space-x-1 mt-1">
+          <h2 className="text-lg font-bold">{name}</h2>
+          <div className="flex items-center">
             {[1, 2, 3, 4, 5].map((star) => (
-              <div
+              <span
                 key={star}
-                className={`mask mask-star-2 w-5 h-5 ${
-                  star <= rating ? "bg-primary" : "bg-gray-300"
+                className={`text-md ${
+                  star <= rating ? "text-primary" : "text-gray-300"
                 }`}
-              ></div>
+              >
+                ★
+              </span>
             ))}
           </div>
         </div>
-        <button className="btn btn-sm">{isOpen ? "Close" : "Expand"}</button>
+        <button className="btn btn-sm" onClick={toggleExpand}>
+          {isExpanded ? "Close" : "Expand"}
+        </button>
       </div>
-      {isOpen && (
-        <div className="card-body p-4">
-          {mealOptions.map((meal, index) => (
-            <MealOption key={index} {...meal} />
+
+      {/* Meal Options */}
+      {isExpanded && (
+        <div>
+          {mealOptions.map((meal) => (
+            <MealOption
+              key={meal.foodName}
+              stationName={meal.stationName}
+              foodName={meal.foodName}
+              rating={meal.rating} // Pass rating for meal options
+              onRate={() => handleRateClick(meal)}
+            />
           ))}
         </div>
+      )}
+
+      {/* Rating Popup for Meals */}
+      {selectedMeal && (
+        <RatingPopup
+          diningHall={name}
+          mealOption={selectedMeal.foodName}
+          onSubmit={handleRatingSubmit}
+          onClose={handleClosePopup}
+        />
       )}
     </div>
   );
