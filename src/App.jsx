@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DiningHallsPage from "./pages/DiningHallsPage";
 import PreferencesPage from "./pages/PreferencesPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
-import RecommendationsPage from "./pages/RecommendationsPage";
+import RecsPage from "./pages/RecsPage";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
             <Route path="/dining-halls" element={<DiningHallsPage />} />
             <Route path="/preferences" element={<PreferencesPage />} />
             <Route path="/user-settings" element={<UserSettingsPage />} />
-            <Route path="/recommendations" element={<RecommendationsPage />} />
+            <Route path="/recommendations" element={<RecsPage />} />
           </Routes>
         </main>
       </div>
