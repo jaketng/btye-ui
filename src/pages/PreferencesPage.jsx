@@ -1,17 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import PastRating from "../components/PastRating";
+import RatingPopup from "../components/RatingPopup";
 
-function PreferencePage() {
-  // Dummy data for past ratings
-  const pastRatings = [
+function PreferenceSettingsPage() {
+  // State for past ratings
+  const [pastRatings, setPastRatings] = useState([
     { stationName: "Grill", foodName: "Grilled Chicken", rating: 4 },
     { stationName: "Main Line", foodName: "Mashed Potatoes", rating: 3 },
     { stationName: "Action Station", foodName: "Stir Fry", rating: 5 },
-  ];
+  ]);
 
-  // Placeholder edit handler
+  // State for selected meal option (used for the popup)
+  const [selectedMeal, setSelectedMeal] = useState(null);
+
+  // Handle edit button click
   const handleEdit = (foodName) => {
-    console.log(`Editing rating for ${foodName}`);
+    const mealToEdit = pastRatings.find(
+      (rating) => rating.foodName === foodName
+    );
+    setSelectedMeal(mealToEdit);
+  };
+
+  // Handle rating submission
+  const handleRatingSubmit = (newRating) => {
+    setPastRatings((prevRatings) =>
+      prevRatings.map((rating) =>
+        rating.foodName === selectedMeal.foodName
+          ? { ...rating, rating: newRating }
+          : rating
+      )
+    );
+    setSelectedMeal(null); // Close popup after submission
   };
 
   return (
@@ -74,8 +93,18 @@ function PreferencePage() {
           </form>
         </div>
       </div>
+
+      {/* Rating Popup */}
+      {selectedMeal && (
+        <RatingPopup
+          diningHall={selectedMeal.stationName}
+          mealOption={selectedMeal.foodName}
+          onSubmit={handleRatingSubmit}
+          onClose={() => setSelectedMeal(null)}
+        />
+      )}
     </div>
   );
 }
 
-export default PreferencePage;
+export default PreferenceSettingsPage;

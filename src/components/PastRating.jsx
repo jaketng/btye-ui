@@ -2,26 +2,37 @@ import React from "react";
 
 function PastRating({ stationName, foodName, rating, onEdit }) {
   return (
-    <div className="flex justify-between items-center border-b border-gray-200 py-4">
-      <div>
-        <h3 className="font-semibold">{stationName}</h3>
-        <p className="text-sm text-gray-500">{foodName}</p>
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="flex space-x-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <div
-              key={star}
-              className={`mask mask-star-2 w-5 h-5 ${
-                star <= rating ? "bg-primary" : "bg-gray-300"
-              }`}
-            ></div>
-          ))}
+    <div>
+      <div className="flex justify-between items-center">
+        {/* Meal Info */}
+        <div>
+          <p className="text-lg font-bold">{foodName}</p>
+          <p className="text-sm text-gray-500">{stationName}</p>
         </div>
-        <button className="btn btn-xs btn-secondary" onClick={onEdit}>
-          Edit
-        </button>
+
+        {/* Stars and Edit Button */}
+        <div className="flex items-center space-x-4">
+          {/* Stars */}
+          <div className="flex items-center">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`text-lg ${
+                  star <= rating ? "text-primary" : "text-gray-300"
+                }`}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+
+          {/* Edit Button */}
+          <button className="btn btn-xs btn-primary" onClick={onEdit}>
+            Edit
+          </button>
+        </div>
       </div>
+      <hr className="border-gray-300 mt-4" />
     </div>
   );
 }
