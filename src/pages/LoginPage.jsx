@@ -30,8 +30,12 @@ function LoginPage() {
       alert("Passwords do not match!");
       return;
     }
-    // Redirect to the recommendations page
-    navigate("/recommendations");
+    // Navigate based on active tab
+    if (activeTab === "signup") {
+      navigate("/preferences");
+    } else {
+      navigate("/recommendations");
+    }
   };
 
   return (
