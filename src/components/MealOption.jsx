@@ -1,39 +1,33 @@
 import React from "react";
 
-function MealOption({ stationName, foodName, rating, onRate }) {
+function MealOption({ foodName, rating, onRate }) {
   return (
-    <div>
-      <div className="flex justify-between items-center py-2">
-        {/* Meal Option Info */}
-        <div>
-          <p className="text-base font-semibold">{stationName}</p>
-          <p className="text-sm text-gray-500">{foodName}</p>
-        </div>
-
-        {/* Rating and Rate Button */}
-        <div className="flex items-center space-x-2">
-          {/* Display-Only Stars */}
-          <div className="flex items-center">
-            {[1, 2, 3, 4, 5].map((star) => (
+    <div className="flex items-center justify-between border-b py-2">
+      <div>
+        {/* Increased text size for meal name */}
+        <p className="text-base font-medium text-gray-800">{foodName}</p>
+      </div>
+      <div className="flex items-center">
+        {/* Ratings */}
+        <div className="rating">
+          {Array(5)
+            .fill(0)
+            .map((_, index) => (
               <span
-                key={star}
-                className={`text-sm ${
-                  star <= rating ? "text-primary" : "text-gray-300"
-                }`}
+                key={index}
+                className={`${
+                  index < rating ? "text-yellow-400" : "text-gray-300"
+                } text-lg`}
               >
                 ★
               </span>
             ))}
-          </div>
-
-          {/* Rate Button */}
-          <button className="btn btn-primary btn-xs" onClick={onRate}>
-            Rate
-          </button>
         </div>
+        {/* Consistent button size */}
+        <button onClick={onRate} className="btn btn-xs btn-primary ml-4">
+          Rate
+        </button>
       </div>
-      {/* Separator Line */}
-      <hr className="border-gray-300" />
     </div>
   );
 }

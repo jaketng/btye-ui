@@ -57,7 +57,7 @@ function RecsPage() {
             onClick={handleSubmit}
             disabled={!selectedFilter}
           >
-            Submit
+            Get Recs
           </button>
         </div>
       )}
