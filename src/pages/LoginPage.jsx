@@ -37,18 +37,16 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left Column */}
-      <div className="w-1/2 bg-blue-300 flex flex-col justify-center items-center text-white p-10">
-        <h1 className="text-5xl font-bold mb-6">WELCOME TO BYTE</h1>
-        <p className="text-lg mb-10 max-w-96">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          varius enim in eros elementum tristique.
+      <div className="w-1/2 bg-blue-300 flex flex-col justify-center text-white p-10">
+        <h1 className="text-3xl font-bold mb-2 ml-12">WELCOME TO</h1>
+        <h1 className="text-6xl font-bold mb-6 ml-12">BYTE</h1>
+        <p className="text-lg mb-10 mx-12 ">
+          Byte is an AI-powered meal planning app designed specifically for
+          Columbia students. It personalizes food recommendations by analyzing
+          your preferences and dining history while pulling real-time menus from
+          Columbia dining halls. Byte makes it simple to discover the perfect
+          meal every day, tailored just for you.
         </p>
-        {/* Placeholder Icons */}
-        <div className="flex justify-around w-full mt-6">
-          <div className="w-16 h-16 bg-white rounded-full"></div>
-          <div className="w-16 h-16 bg-white rounded-full"></div>
-          <div className="w-16 h-16 bg-white rounded-full"></div>
-        </div>
       </div>
 
       {/* Right Column */}
