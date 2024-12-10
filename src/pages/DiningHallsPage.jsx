@@ -5,11 +5,14 @@ import { fetchDiningData } from "../services/mealScraper";
 function DiningHallsPage() {
   const [diningHalls, setDiningHalls] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("Breakfast");
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     async function loadDiningData() {
+      setIsLoading(true); // Set loading to true before fetching data
       const data = await fetchDiningData(selectedFilter.toLowerCase());
       setDiningHalls(data);
+      setIsLoading(false); // Set loading to false after data is fetched
     }
     loadDiningData();
   }, [selectedFilter]);
@@ -46,20 +49,26 @@ function DiningHallsPage() {
       </div>
 
       {/* Dining Halls Section */}
-      <div className="flex gap-6">
-        {columns.map((column, colIndex) => (
-          <div key={colIndex} className="flex flex-col gap-6 flex-1">
-            {column.map((hall) => (
-              <DiningHall
-                key={hall.name}
-                name={hall.name}
-                rating={hall.rating}
-                mealOptions={hall.mealOptions}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-blue-400 text-xl">Loading...</div>
+        </div>
+      ) : (
+        <div className="flex gap-6">
+          {columns.map((column, colIndex) => (
+            <div key={colIndex} className="flex flex-col gap-6 flex-1">
+              {column.map((hall) => (
+                <DiningHall
+                  key={hall.name}
+                  name={hall.name}
+                  rating={hall.rating}
+                  mealOptions={hall.mealOptions}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
