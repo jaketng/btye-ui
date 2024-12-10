@@ -6,10 +6,12 @@ import UserSettingsPage from "./pages/UserSettingsPage";
 import RecsPage from "./pages/RecsPage";
 import LoginPage from "./pages/LoginPage";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer"; // Import the Footer component
 
 function App() {
   const location = useLocation(); // Works because App is wrapped in Router
   const navbarExcludedPaths = ["/login"];
+  const footerExcludedPaths = ["/login"]; // Exclude footer from specific paths if needed
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -23,6 +25,7 @@ function App() {
           <Route path="/recommendations" element={<RecsPage />} />
         </Routes>
       </main>
+      {!footerExcludedPaths.includes(location.pathname) && <Footer />}
     </div>
   );
 }

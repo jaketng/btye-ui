@@ -37,7 +37,7 @@ function DiningHallsPage() {
               key={filter}
               className={`cursor-pointer px-4 py-2 border border-blue-400 rounded-lg ${
                 selectedFilter === filter
-                  ? "bg-blue-400 text-white"
+                  ? "bg-primary text-white"
                   : "bg-gray-100 text-blue-400"
               }`}
               onClick={() => handleFilterClick(filter)}

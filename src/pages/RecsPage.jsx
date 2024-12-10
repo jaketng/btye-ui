@@ -27,16 +27,16 @@ function RecsPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-12 flex min-h-[calc(100vh-6rem)] items-center justify-center">
+    <div className="container mx-auto px-6 py-12 flex min-h-[calc(100vh-10rem)] items-center justify-center">
       {/* Stage 1: Before the Recommendation */}
       {!hasRec && (
         <div className="text-center space-y-8 w-full max-w-lg">
           {/* BYTE name */}
-          <h1 className="text-7xl font-extrabold text-primary">BYTE</h1>
+          <h1 className="text-8xl font-extrabold text-primary">BYTE</h1>
 
           {/* Filter Options */}
           <div className="flex justify-center space-x-4">
-            {["Open Now", "Breakfast", "Lunch", "Dinner"].map((filter) => (
+            {["Breakfast", "Lunch", "Dinner"].map((filter) => (
               <div
                 key={filter}
                 className={`cursor-pointer px-4 py-2 border border-primary rounded-lg ${
@@ -53,7 +53,7 @@ function RecsPage() {
 
           {/* Submit Button */}
           <button
-            className="btn bg-primary border-primary hover:bg-primary-focus hover:border-primary-focus text-white"
+            className="btn bg-blue-300 hover:bg-primary hover:border-primary text-white"
             onClick={handleSubmit}
             disabled={!selectedFilter}
           >
@@ -66,7 +66,7 @@ function RecsPage() {
       {hasRec && (
         <div className="space-y-6 w-full max-w-4xl">
           {/* Recommendation Heading */}
-          <h2 className="text-3xl font-bold text-gray-700">
+          <h2 className="text-2xl pb-12 font-bold text-gray-700">
             Based on our Machine Learning Algorithm, we recommend...
           </h2>
 
