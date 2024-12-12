@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MealOption from "./MealOption";
 import RatingPopup from "./RatingPopup";
-import { getGlobalMealRating, generateMealId } from '../services/ratingService';
+import { getGlobalMealRating, generateMealId } from "../services/ratingService";
 
 function DiningHall({ name, stations = [] }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -36,25 +36,27 @@ function DiningHall({ name, stations = [] }) {
   // Function to deduplicate items across stations
   const getUniqueStations = (stations) => {
     const seenItems = new Set();
-    
-    return stations.map(station => {
-      const uniqueItems = station.items.filter(item => {
-        const itemKey = `${item.name}-${item.mealTime}`;
-        if (seenItems.has(itemKey)) {
-          return false;
-        }
-        seenItems.add(itemKey);
-        return true;
-      });
 
-      return {
-        ...station,
-        items: uniqueItems.map(item => ({
-          ...item,
-          rating: mealRatings[generateMealId(name, item.name)]?.averageRating || 0
-        }))
-      };
-    }).filter(station => station.items.length > 0);
+    return stations
+      .map((station) => {
+        const uniqueItems = station.items.filter((item) => {
+          const itemKey = `${item.name}-${item.mealTime}`;
+          if (seenItems.has(itemKey)) {
+            return false;
+          }
+          seenItems.add(itemKey);
+          return true;
+        });
+
+        return {
+          ...station,
+          items: uniqueItems.map((item) => ({
+            ...item,
+            rating: mealRatings[generateMealId(name, item.name)]?.averageRating || 0,
+          })),
+        };
+      })
+      .filter((station) => station.items.length > 0);
   };
 
   const uniqueStations = getUniqueStations(stations);
@@ -66,7 +68,7 @@ function DiningHall({ name, stations = [] }) {
   const handleRateClick = (meal, stationName) => {
     setSelectedMeal({
       ...meal,
-      stationName
+      stationName,
     });
   };
 
@@ -74,11 +76,16 @@ function DiningHall({ name, stations = [] }) {
     setSelectedMeal(null);
   };
 
-  // Calculate dining hall's average rating
+  // Calculate dining hall's average rating based on non-zero rated meals
   const calculateOverallRating = () => {
     const ratings = Object.values(mealRatings);
-    if (ratings.length === 0) return 0;
-    return ratings.reduce((sum, r) => sum + r.averageRating, 0) / ratings.length;
+    // Filter out meals with zero rating
+    const nonZeroRatings = ratings.filter((r) => r.averageRating > 0);
+
+    if (nonZeroRatings.length === 0) return 0;
+
+    const sum = nonZeroRatings.reduce((acc, curr) => acc + curr.averageRating, 0);
+    return sum / nonZeroRatings.length;
   };
 
   return (
@@ -99,10 +106,7 @@ function DiningHall({ name, stations = [] }) {
             ))}
           </div>
         </div>
-        <button 
-          className="btn btn-sm" 
-          onClick={toggleExpand}
-        >
+        <button className="btn btn-sm" onClick={toggleExpand}>
           {isExpanded ? "Close" : "Expand"}
         </button>
       </div>
@@ -110,8 +114,8 @@ function DiningHall({ name, stations = [] }) {
       {isExpanded && uniqueStations.length > 0 && (
         <div className="space-y-4">
           {uniqueStations.map((station, stationIndex) => (
-            <div 
-              key={`${name}-${station.name}-${stationIndex}`} 
+            <div
+              key={`${name}-${station.name}-${stationIndex}`}
               className="border-t pt-4 first:border-t-0 first:pt-0"
             >
               <h3 className="font-semibold text-gray-700 mb-2">{station.name}</h3>

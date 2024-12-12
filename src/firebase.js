@@ -5,14 +5,21 @@ import {
   signInWithPopup,
   onAuthStateChanged,
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  addDoc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCS0AUECWEoRKfo4bDAJgzfK7IFsqAsqU4",
   authDomain: "cumulonimbus-cloud-firebase.firebaseapp.com",
   projectId: "cumulonimbus-cloud-firebase",
-  storageBucket: "cumulonimbus-cloud-firebase.appspot.com", // Corrected typo here
+  storageBucket: "cumulonimbus-cloud-firebase.appspot.com",
   messagingSenderId: "1090397435126",
   appId: "1:1090397435126:web:2cf99ea7b5ef46d82428d7",
   measurementId: "G-YGKCMR6P34",
@@ -24,6 +31,8 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 const auth = getAuth(app);
 const db = getFirestore(app);
+console.log("Firestore initialized:", db);
+
 const provider = new GoogleAuthProvider();
 
 // Function to handle Google Sign-In
@@ -32,6 +41,7 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user; // Get the signed-in user's details
     console.log("Google Sign-In successful. User:", user);
+    
     return user; // Return user details if needed
   } catch (error) {
     console.error("Google Sign-In Error:", error);
@@ -41,7 +51,7 @@ export const signInWithGoogle = async () => {
 
 // Track the authenticated user
 let currentUser = null; // Variable to hold current user
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
     console.log("User signed in:", user);
