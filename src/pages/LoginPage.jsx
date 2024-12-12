@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { auth, signInWithGoogle } from "../firebase"; // Import Google sign-in function
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { useAuth } from "../contexts/AuthContext"; // Import AuthContext
 
 function LoginPage() {
@@ -32,7 +36,11 @@ function LoginPage() {
         return;
       }
       try {
-        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
         alert("Sign-up successful!");
         navigate("/preferences");
       } catch (error) {
@@ -48,6 +56,18 @@ function LoginPage() {
         console.error("Error logging in:", error);
         alert("Invalid email or password.");
       }
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const user = await signInWithGoogle(); // Call Google sign-in
+      console.log("Signed in with Google:", user);
+      alert(`Welcome, ${user.displayName}`);
+      navigate("/recommendations"); // Redirect after successful Google sign-in
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      alert("Failed to sign in with Google. Please try again.");
     }
   };
 
@@ -78,8 +98,11 @@ function LoginPage() {
         <div className="bg-white p-8 rounded-lg shadow-md w-3/4 max-w-md">
           {currentUser ? (
             <div>
-              <p>Welcome, {currentUser.email}</p>
-              <button onClick={handleLogout} className="btn btn-primary w-full">
+              <p>Welcome, {currentUser.displayName || currentUser.email}!</p>
+              <button
+                onClick={handleLogout}
+                className="btn btn-primary w-full mt-4"
+              >
                 Logout
               </button>
             </div>
@@ -149,10 +172,19 @@ function LoginPage() {
                   </div>
                 )}
 
-                <button type="submit" className="btn btn-primary w-full">
+                <button type="submit" className="btn btn-primary w-full mb-4">
                   {activeTab === "login" ? "Login" : "Sign Up"}
                 </button>
               </form>
+
+              {activeTab === "login" && (
+                <button
+                  onClick={handleGoogleSignIn}
+                  className="btn btn-secondary w-full"
+                >
+                  Sign in with Google
+                </button>
+              )}
             </>
           )}
         </div>
