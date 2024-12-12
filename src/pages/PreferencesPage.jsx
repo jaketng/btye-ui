@@ -1,19 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PastRating from "../components/PastRating";
 import RatingPopup from "../components/RatingPopup";
+import { auth, db } from "../firebase";
+import { doc, getDoc } from 'firebase/firestore';
+import { submitRating } from '../services/ratingService'; // Existing import
 
 function PreferenceSettingsPage() {
-  // State for past ratings
-  const [pastRatings, setPastRatings] = useState([
-    { stationName: "Grill", foodName: "Grilled Chicken", rating: 4 },
-    { stationName: "Main Line", foodName: "Mashed Potatoes", rating: 3 },
-    { stationName: "Action Station", foodName: "Stir Fry", rating: 5 },
-  ]);
-
-  // State for selected meal option (used for the popup)
+  const [pastRatings, setPastRatings] = useState([]);
   const [selectedMeal, setSelectedMeal] = useState(null);
 
-  // Handle edit button click
+  useEffect(() => {
+    async function fetchUserRatings() {
+      if (auth.currentUser) {
+        const userId = auth.currentUser.uid;
+        const userRatingsRef = doc(db, 'userRatings', userId);
+        const userRatingsDoc = await getDoc(userRatingsRef);
+        
+        if (userRatingsDoc.exists()) {
+          const data = userRatingsDoc.data();
+          const ratings = data.ratings || {};
+          
+          // Transform ratings object into an array that matches the PastRating component props
+          const ratingsArray = Object.keys(ratings).map((mealId) => ({
+            stationName: ratings[mealId].diningHall,
+            foodName: ratings[mealId].mealOption,
+            rating: ratings[mealId].averageRating // Using the average rating as a display value
+          }));
+
+          setPastRatings(ratingsArray);
+        } else {
+          // If no document, user has no past ratings
+          setPastRatings([]);
+        }
+      } else {
+        // If user is not logged in, maybe set to empty or handle differently
+        setPastRatings([]);
+      }
+    }
+
+    fetchUserRatings();
+  }, []);
+
+  // Handle edit button click - triggers the rating popup
   const handleEdit = (foodName) => {
     const mealToEdit = pastRatings.find(
       (rating) => rating.foodName === foodName
@@ -21,16 +49,25 @@ function PreferenceSettingsPage() {
     setSelectedMeal(mealToEdit);
   };
 
-  // Handle rating submission
-  const handleRatingSubmit = (newRating) => {
-    setPastRatings((prevRatings) =>
-      prevRatings.map((rating) =>
-        rating.foodName === selectedMeal.foodName
-          ? { ...rating, rating: newRating }
-          : rating
-      )
-    );
-    setSelectedMeal(null); // Close popup after submission
+  // Handle rating submission (when popup is closed)
+  // Here we call the submitRating service to update Firestore
+  const handleRatingSubmit = async (newRating) => {
+    try {
+      await submitRating(selectedMeal.stationName, selectedMeal.foodName, newRating);
+      
+      // Update the local state to reflect the new rating
+      setPastRatings((prevRatings) =>
+        prevRatings.map((rating) =>
+          rating.foodName === selectedMeal.foodName
+            ? { ...rating, rating: newRating }
+            : rating
+        )
+      );
+      setSelectedMeal(null);
+    } catch (error) {
+      console.error("Error updating rating:", error);
+      alert("There was an error updating your rating. Please try again.");
+    }
   };
 
   return (
@@ -40,15 +77,19 @@ function PreferenceSettingsPage() {
         <div className="col-span-1 bg-base-100 shadow-md p-4">
           <h2 className="text-xl font-bold mb-4">Past Ratings</h2>
           <div className="space-y-4">
-            {pastRatings.map((rating, index) => (
-              <PastRating
-                key={index}
-                stationName={rating.stationName}
-                foodName={rating.foodName}
-                rating={rating.rating}
-                onEdit={() => handleEdit(rating.foodName)}
-              />
-            ))}
+            {pastRatings.length > 0 ? (
+              pastRatings.map((rating, index) => (
+                <PastRating
+                  key={index}
+                  stationName={rating.stationName}
+                  foodName={rating.foodName}
+                  rating={rating.rating}
+                  onEdit={() => handleEdit(rating.foodName)}
+                />
+              ))
+            ) : (
+              <p>No past ratings found.</p>
+            )}
           </div>
         </div>
 
@@ -99,8 +140,8 @@ function PreferenceSettingsPage() {
         <RatingPopup
           diningHall={selectedMeal.stationName}
           mealOption={selectedMeal.foodName}
-          onSubmit={handleRatingSubmit}
           onClose={() => setSelectedMeal(null)}
+          onSubmit={handleRatingSubmit}  // Pass the handleRatingSubmit to update Firestore
         />
       )}
     </div>
