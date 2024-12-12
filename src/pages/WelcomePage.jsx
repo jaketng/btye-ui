@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext"; // Import AuthContext
 
 function WelcomePage() {
+  const { currentUser } = useAuth(); // Get current user from AuthContext
   const navigate = useNavigate();
 
-  const goToLogin = () => {
-    navigate("/login");
+  const handleButtonClick = () => {
+    if (currentUser) {
+      navigate("/recommendations"); // Navigate directly to recommendations if logged in
+    } else {
+      navigate("/login"); // Navigate to the login page if not logged in
+    }
   };
 
   return (
@@ -21,10 +27,10 @@ function WelcomePage() {
           discover the perfect meal every day, tailored just for you.
         </p>
         <button
-          onClick={goToLogin}
+          onClick={handleButtonClick}
           className="btn btn-primary px-6 py-3 text-blue-500 bg-white font-bold rounded-lg shadow-lg hover:bg-gray-100"
         >
-          Go to Login Page
+          {currentUser ? "Go to Recommendations" : "Go to Login Page"}
         </button>
       </div>
     </div>
