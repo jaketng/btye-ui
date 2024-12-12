@@ -80,7 +80,11 @@ function LoginPage() {
       console.error("Error logging out:", error);
     }
   };
-  
+
+  const goToRecommendations = () => {
+    navigate("/recommendations"); // Navigate to recommendations page
+  };
+
   return (
     <div className="flex min-h-screen">
       <div className="w-1/2 bg-blue-300 flex flex-col justify-center text-white p-10">
@@ -98,13 +102,19 @@ function LoginPage() {
       <div className="w-1/2 bg-gray-100 flex flex-col justify-center items-center">
         <div className="bg-white p-8 rounded-lg shadow-md w-3/4 max-w-md">
           {currentUser ? (
-            <div>
+            <div className="space-y-4">
               <p>Welcome, {currentUser.displayName || currentUser.email}!</p>
               <button
                 onClick={handleLogout}
                 className="btn btn-primary w-full mt-4"
               >
                 Logout
+              </button>
+              <button
+                onClick={goToRecommendations}
+                className="btn btn-secondary w-full mt-4"
+              >
+                Go to Recommendations
               </button>
             </div>
           ) : (
