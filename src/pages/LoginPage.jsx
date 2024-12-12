@@ -75,11 +75,12 @@ function LoginPage() {
     try {
       await signOut(auth);
       alert("Logged out successfully!");
+      navigate("/login"); // Redirect to login page
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
-
+  
   return (
     <div className="flex min-h-screen">
       <div className="w-1/2 bg-blue-300 flex flex-col justify-center text-white p-10">
