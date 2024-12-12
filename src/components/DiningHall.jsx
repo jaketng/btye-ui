@@ -1,31 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MealOption from "./MealOption";
 import RatingPopup from "./RatingPopup";
+import { getGlobalMealRating, generateMealId } from '../services/ratingService';
 
-function DiningHall({ name, rating, mealOptions }) {
+function DiningHall({ name, stations = [] }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
+  const [mealRatings, setMealRatings] = useState({});
+
+  // Fetch ratings for all meals in this dining hall
+  useEffect(() => {
+    const fetchMealRatings = async () => {
+      const ratings = {};
+      for (const station of stations) {
+        for (const item of station.items) {
+          const mealId = generateMealId(name, item.name);
+          try {
+            const rating = await getGlobalMealRating(mealId);
+            if (rating) {
+              ratings[mealId] = rating;
+            }
+          } catch (error) {
+            console.error(`Error fetching rating for ${item.name}:`, error);
+          }
+        }
+      }
+      setMealRatings(ratings);
+    };
+
+    if (isExpanded) {
+      fetchMealRatings();
+    }
+  }, [isExpanded, name, stations]);
+
+  // Function to deduplicate items across stations
+  const getUniqueStations = (stations) => {
+    const seenItems = new Set();
+    
+    return stations.map(station => {
+      const uniqueItems = station.items.filter(item => {
+        const itemKey = `${item.name}-${item.mealTime}`;
+        if (seenItems.has(itemKey)) {
+          return false;
+        }
+        seenItems.add(itemKey);
+        return true;
+      });
+
+      return {
+        ...station,
+        items: uniqueItems.map(item => ({
+          ...item,
+          rating: mealRatings[generateMealId(name, item.name)]?.averageRating || 0
+        }))
+      };
+    }).filter(station => station.items.length > 0);
+  };
+
+  const uniqueStations = getUniqueStations(stations);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleRateClick = (meal) => {
-    setSelectedMeal(meal);
+  const handleRateClick = (meal, stationName) => {
+    setSelectedMeal({
+      ...meal,
+      stationName
+    });
   };
 
   const handleClosePopup = () => {
     setSelectedMeal(null);
   };
 
-  const handleRatingSubmit = (rating) => {
-    console.log(`Rated ${selectedMeal.foodName} at ${name}: ${rating} stars`);
-    handleClosePopup();
+  // Calculate dining hall's average rating
+  const calculateOverallRating = () => {
+    const ratings = Object.values(mealRatings);
+    if (ratings.length === 0) return 0;
+    return ratings.reduce((sum, r) => sum + r.averageRating, 0) / ratings.length;
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-4">
-      {/* Dining Hall Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-lg font-bold">{name}</h2>
@@ -34,7 +91,7 @@ function DiningHall({ name, rating, mealOptions }) {
               <span
                 key={star}
                 className={`text-md ${
-                  star <= rating ? "text-primary" : "text-gray-300"
+                  star <= calculateOverallRating() ? "text-primary" : "text-gray-300"
                 }`}
               >
                 ★
@@ -42,32 +99,42 @@ function DiningHall({ name, rating, mealOptions }) {
             ))}
           </div>
         </div>
-        <button className="btn btn-sm" onClick={toggleExpand}>
+        <button 
+          className="btn btn-sm" 
+          onClick={toggleExpand}
+        >
           {isExpanded ? "Close" : "Expand"}
         </button>
       </div>
 
-      {/* Meal Options */}
-      {isExpanded && (
-        <div>
-          {mealOptions.map((meal) => (
-            <MealOption
-              key={meal.foodName}
-              stationName={meal.stationName}
-              foodName={meal.foodName}
-              rating={meal.rating} // Pass rating for meal options
-              onRate={() => handleRateClick(meal)}
-            />
+      {isExpanded && uniqueStations.length > 0 && (
+        <div className="space-y-4">
+          {uniqueStations.map((station, stationIndex) => (
+            <div 
+              key={`${name}-${station.name}-${stationIndex}`} 
+              className="border-t pt-4 first:border-t-0 first:pt-0"
+            >
+              <h3 className="font-semibold text-gray-700 mb-2">{station.name}</h3>
+              <div className="space-y-2 pl-4">
+                {station.items.map((item, itemIndex) => (
+                  <MealOption
+                    key={`${name}-${station.name}-${item.name}-${itemIndex}`}
+                    foodName={item.name}
+                    rating={item.rating}
+                    totalRatings={mealRatings[generateMealId(name, item.name)]?.totalRatings}
+                    onRate={() => handleRateClick(item, station.name)}
+                  />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Rating Popup for Meals */}
       {selectedMeal && (
         <RatingPopup
           diningHall={name}
-          mealOption={selectedMeal.foodName}
-          onSubmit={handleRatingSubmit}
+          mealOption={selectedMeal.name}
           onClose={handleClosePopup}
         />
       )}

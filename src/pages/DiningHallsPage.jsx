@@ -4,21 +4,22 @@ import { fetchDiningData } from "../services/mealScraper";
 
 function DiningHallsPage() {
   const [diningHalls, setDiningHalls] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState("Breakfast");
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [selectedFilter, setSelectedFilter] = useState("breakfast"); // Changed to lowercase to match API
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadDiningData() {
-      setIsLoading(true); // Set loading to true before fetching data
-      const data = await fetchDiningData(selectedFilter.toLowerCase());
+      setIsLoading(true);
+      const data = await fetchDiningData(selectedFilter);
+      console.log("Fetched dining data:", data); // Debug log
       setDiningHalls(data);
-      setIsLoading(false); // Set loading to false after data is fetched
+      setIsLoading(false);
     }
     loadDiningData();
   }, [selectedFilter]);
 
   const handleFilterClick = (filter) => {
-    setSelectedFilter(filter);
+    setSelectedFilter(filter.toLowerCase());
   };
 
   // Divide dining halls into columns
@@ -36,7 +37,7 @@ function DiningHallsPage() {
             <div
               key={filter}
               className={`cursor-pointer px-4 py-2 border border-blue-400 rounded-lg ${
-                selectedFilter === filter
+                selectedFilter === filter.toLowerCase()
                   ? "bg-primary text-white"
                   : "bg-gray-100 text-blue-400"
               }`}
@@ -61,8 +62,8 @@ function DiningHallsPage() {
                 <DiningHall
                   key={hall.name}
                   name={hall.name}
-                  rating={hall.rating}
-                  mealOptions={hall.mealOptions}
+                  rating={hall.rating || 0}
+                  stations={hall.stations || []} // Changed from mealOptions to stations
                 />
               ))}
             </div>
