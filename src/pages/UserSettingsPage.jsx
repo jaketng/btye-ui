@@ -14,9 +14,8 @@ function UserSettingsPage() {
     <div className="flex justify-center items-center min-h-[calc(100vh-8.25rem)] bg-gray-100">
       <div className="bg-white shadow-lg p-8 rounded-lg w-3/4 max-w-md">
         <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
-
         {/* Email Section */}
-        <div className="form-control mb-6">
+        {/* <div className="form-control mb-6">
           <label className="label">
             <span className="label-text font-medium text-gray-700">Email:</span>
           </label>
@@ -34,7 +33,7 @@ function UserSettingsPage() {
         </div>
 
         {/* Password Section */}
-        <div className="form-control mb-6">
+        {/* <div className="form-control mb-6">
           <label className="label">
             <span className="label-text font-medium text-gray-700">
               Password:
@@ -51,7 +50,7 @@ function UserSettingsPage() {
               Update Password
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Logout Button */}
         <button
