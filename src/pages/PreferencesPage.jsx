@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import PastRating from "../components/PastRating";
 import RatingPopup from "../components/RatingPopup";
 import { auth, db } from "../firebase";
-import { doc, getDoc } from 'firebase/firestore';
-import { submitRating } from '../services/ratingService'; // Existing import
+import { doc, getDoc } from "firebase/firestore";
+import { submitRating } from "../services/ratingService"; // Existing import
 
 function PreferenceSettingsPage() {
   const [pastRatings, setPastRatings] = useState([]);
@@ -13,18 +13,18 @@ function PreferenceSettingsPage() {
     async function fetchUserRatings() {
       if (auth.currentUser) {
         const userId = auth.currentUser.uid;
-        const userRatingsRef = doc(db, 'userRatings', userId);
+        const userRatingsRef = doc(db, "userRatings", userId);
         const userRatingsDoc = await getDoc(userRatingsRef);
-        
+
         if (userRatingsDoc.exists()) {
           const data = userRatingsDoc.data();
           const ratings = data.ratings || {};
-          
+
           // Transform ratings object into an array that matches the PastRating component props
           const ratingsArray = Object.keys(ratings).map((mealId) => ({
             stationName: ratings[mealId].diningHall,
             foodName: ratings[mealId].mealOption,
-            rating: ratings[mealId].averageRating // Using the average rating as a display value
+            rating: ratings[mealId].averageRating, // Using the average rating as a display value
           }));
 
           setPastRatings(ratingsArray);
@@ -53,8 +53,12 @@ function PreferenceSettingsPage() {
   // Here we call the submitRating service to update Firestore
   const handleRatingSubmit = async (newRating) => {
     try {
-      await submitRating(selectedMeal.stationName, selectedMeal.foodName, newRating);
-      
+      await submitRating(
+        selectedMeal.stationName,
+        selectedMeal.foodName,
+        newRating
+      );
+
       // Update the local state to reflect the new rating
       setPastRatings((prevRatings) =>
         prevRatings.map((rating) =>
@@ -96,42 +100,42 @@ function PreferenceSettingsPage() {
         {/* Adjust Preferences Section */}
         <div className="col-span-2 bg-base-100 shadow-md p-6">
           <h2 className="text-xl font-bold mb-4">Adjust Preferences</h2>
-          <form className="space-y-6">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Preferred Cuisine</span>
-              </label>
-              <select className="select select-bordered w-full">
-                <option>Italian</option>
-                <option>Mexican</option>
-                <option>Asian</option>
-                <option>American</option>
-              </select>
-            </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Preferred Cuisine</span>
+            </label>
+            <select className="select select-bordered w-full">
+              <option>Italian</option>
+              <option>Mexican</option>
+              <option>Asian</option>
+              <option>American</option>
+            </select>
+          </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Dietary Restrictions</span>
-              </label>
-              <textarea
-                className="textarea textarea-bordered w-full"
-                placeholder="e.g., Vegetarian, Gluten-Free"
-              ></textarea>
-            </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Dietary Restrictions</span>
+            </label>
+            <textarea
+              className="textarea textarea-bordered w-full"
+              placeholder="e.g., Vegetarian, Gluten-Free"
+            ></textarea>
+          </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Favorite Ingredients</span>
-              </label>
-              <input
-                type="text"
-                placeholder="e.g., Chicken, Broccoli"
-                className="input input-bordered w-full"
-              />
-            </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Favorite Ingredients</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Chicken, Broccoli"
+              className="input input-bordered w-full"
+            />
+          </div>
 
-            <button className="btn btn-primary w-full">Save Preferences</button>
-          </form>
+          <button className="btn btn-primary w-full mt-6">
+            Save Preferences
+          </button>
         </div>
       </div>
 
@@ -141,7 +145,7 @@ function PreferenceSettingsPage() {
           diningHall={selectedMeal.stationName}
           mealOption={selectedMeal.foodName}
           onClose={() => setSelectedMeal(null)}
-          onSubmit={handleRatingSubmit}  // Pass the handleRatingSubmit to update Firestore
+          onSubmit={handleRatingSubmit} // Pass the handleRatingSubmit to update Firestore
         />
       )}
     </div>
