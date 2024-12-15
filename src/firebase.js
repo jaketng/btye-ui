@@ -5,16 +5,9 @@ import {
   signInWithPopup,
   onAuthStateChanged,
 } from "firebase/auth";
-import {
-  getFirestore,
-  collection,
-  doc,
-  addDoc,
-  setDoc,
-  getDoc,
-} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
-// Firebase configuration
+// Firebase configuration (hardcoded)
 const firebaseConfig = {
   apiKey: "AIzaSyCS0AUECWEoRKfo4bDAJgzfK7IFsqAsqU4",
   authDomain: "cumulonimbus-cloud-firebase.firebaseapp.com",
@@ -29,19 +22,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
-const auth = getAuth(app);
-const db = getFirestore(app);
-console.log("Firestore initialized:", db);
-
-const provider = new GoogleAuthProvider();
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const provider = new GoogleAuthProvider();
 
 // Function to handle Google Sign-In
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
-    const user = result.user; // Get the signed-in user's details
+    const user = result.user;
     console.log("Google Sign-In successful. User:", user);
-    
     return user; // Return user details if needed
   } catch (error) {
     console.error("Google Sign-In Error:", error);
@@ -50,15 +40,10 @@ export const signInWithGoogle = async () => {
 };
 
 // Track the authenticated user
-let currentUser = null; // Variable to hold current user
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (user) {
-    currentUser = user;
     console.log("User signed in:", user);
   } else {
-    currentUser = null;
     console.log("No user signed in.");
   }
 });
-
-export { auth, db, provider, currentUser };
